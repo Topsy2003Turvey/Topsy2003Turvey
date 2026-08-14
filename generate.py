@@ -733,6 +733,25 @@ def gen_link_button(filename: str, label: str, sub: str) -> None:
     write_svg(filename, body)
 
 
+def update_readme_cachebust() -> None:
+    """Point live cards at a new URL whenever stats change so GitHub recaches them."""
+    stats = get_stats()
+    stamp = (
+        f"{int(stats['contributions'])}-{int(stats['followers'])}-"
+        f"{int(stats['repos'])}-{int(stats['stars'])}"
+    )
+    readme = ROOT / "README.md"
+    text = readme.read_text(encoding="utf-8")
+    for src in ("assets/banner.svg", "assets/stats.svg", "assets/heatmap.svg"):
+        text = re.sub(
+            rf'src="{re.escape(src)}(?:\?v=[^"]*)?"',
+            f'src="{src}?v={stamp}"',
+            text,
+        )
+    readme.write_text(text, encoding="utf-8")
+    print(f"readme cache-bust v={stamp}")
+
+
 def main() -> None:
     ASSETS.mkdir(exist_ok=True)
     get_stats()
@@ -747,6 +766,7 @@ def main() -> None:
     gen_link_button("link-linkedin.svg", "LinkedIn", "stéfan-turvey")
     gen_link_button("link-stackoverflow.svg", "Stack Overflow", "71 reputation")
     gen_link_button("link-discord.svg", "Discord", "open profile")
+    update_readme_cachebust()
     print("done")
 
 
