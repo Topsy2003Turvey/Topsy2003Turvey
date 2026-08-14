@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import base64
 import json
+from collections import deque
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -108,8 +109,24 @@ def section_label(text: str) -> str:
 
 def load_b64(path: Path) -> str:
     raw = path.read_bytes()
+    if raw.startswith(b"\x89PNG"):
+        mime = "image/png"
+    elif raw.startswith(b"\xff\xd8"):
+        mime = "image/jpeg"
+    elif raw.startswith(b"GIF8"):
+        mime = "image/gif"
+    elif raw[:4] == b"RIFF" and raw[8:12] == b"WEBP":
+        mime = "image/webp"
+    else:
+        mime = {
+            ".png": "image/png",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".gif": "image/gif",
+            ".webp": "image/webp",
+        }.get(path.suffix.lower(), "image/jpeg")
     b64 = base64.b64encode(raw).decode("ascii")
-    return f"data:image/jpeg;base64,{b64}"
+    return f"data:{mime};base64,{b64}"
 
 
 def gen_banner() -> None:
@@ -128,7 +145,7 @@ def gen_banner() -> None:
   <path d="M 148 78 Q 310 58 470 78" fill="none" stroke="{TEXT}" stroke-width="0.7" opacity="0.28"/>
   <text x="148" y="86" fill="{TEXT}" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">@Topsy2003Turvey</text>
   <text x="148" y="124" fill="{TEXT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="800">Stéfan Driaan Turvey</text>
-  <text x="148" y="152" fill="{PINK_SOFT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15">BSc Hons IT · Data Science · Night City, ZA</text>
+  <text x="148" y="152" fill="{PINK_SOFT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15">BSc Hons IT · Data Science · Pretoria, ZA</text>
   <g font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="{TEXT}">
     <rect x="148" y="172" width="78" height="26" rx="13" fill="#14081c" stroke="{GOLD}" stroke-width="1.2"/>
     <text x="187" y="190" text-anchor="middle">Python</text>
@@ -143,11 +160,84 @@ def gen_banner() -> None:
     write_svg("banner.svg", body)
 
 
-def gen_ascii() -> None:
+def _is_cream_background(rgb: tuple[int, int, int]) -> bool:
+    r, g, b = (int(c) for c in rgb)
+    if min(r, g, b) < 215 or (r + g + b) / 3 < 235:
+        return False
+    # Hat fur is pink-white (R high, G lower). Real backdrop is cream/neutral.
+    if r - g > 8 and b > g - 5:
+        return False
+    return True
+
+
+def _background_mask(img) -> list[list[bool]]:
+    pixels = img.load()
+    w, h = img.size
+    seen = [[False] * w for _ in range(h)]
+    q: deque[tuple[int, int]] = deque()
+
+    def seed(x: int, y: int) -> None:
+        if not seen[y][x] and _is_cream_background(pixels[x, y]):
+            seen[y][x] = True
+            q.append((x, y))
+
+    for x in range(w):
+        seed(x, 0)
+        seed(x, h - 1)
+        if h > 2:
+            seed(x, 1)
+            seed(x, h - 2)
+    for y in range(h):
+        seed(0, y)
+        seed(w - 1, y)
+
+    while q:
+        x, y = q.popleft()
+        for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+            if 0 <= nx < w and 0 <= ny < h and not seen[ny][nx] and _is_cream_background(pixels[nx, ny]):
+                seen[ny][nx] = True
+                q.append((nx, ny))
+    return seen
+
+
+def _punch_backdrop(img):
+    """Key out the cream photo backdrop and keep the white hat trim visible."""
+    src = img.convert("RGB")
+    mask = _background_mask(src)
+    pixels = src.load()
+    w, h = src.size
+    for y in range(h):
+        for x in range(w):
+            if mask[y][x]:
+                pixels[x, y] = (18, 0, 24)
+                continue
+            r, g, b = pixels[x, y]
+            # Keep the Santa hat fur as a bright white-pink band on the dark card.
+            if r > 220 and g > 205 and b > 205:
+                pixels[x, y] = (255, 244, 250)
+    return src
+
+
+def _blink_frame(img):
+    from PIL import ImageDraw
+
+    out = img.copy()
+    draw = ImageDraw.Draw(out)
+    w, h = out.size
+    # Profile eye on the source 184x184 xmas portrait; scale if needed.
+    sx, sy = w / 184, h / 184
+    cx, cy = 137 * sx, 98 * sy
+    rw, rh = 16 * sx, 7 * sy
+    lid = (232, 168, 188)
+    lash = (52, 28, 38)
+    draw.ellipse((cx - rw, cy - rh, cx + rw, cy + rh), fill=lid)
+    draw.line((cx - rw + 2, cy + 1, cx + rw - 2, cy + 2), fill=lash, width=max(2, int(3 * sy)))
+    return out
+
+
+def _ascii_lines(img, cols: int, rows: int) -> list[str]:
     from PIL import Image
 
-    img = Image.open(ASSETS / "xmas-girl.gif").convert("RGB")
-    cols, rows = 62, 38
     img = img.resize((cols, rows), Image.Resampling.LANCZOS)
     chars = " .:-=+*#%@"
     lines = []
@@ -155,30 +245,52 @@ def gen_ascii() -> None:
         parts = []
         for x in range(cols):
             r, g, b = img.getpixel((x, y))
-            if r > 232 and g > 232 and b > 232:
-                parts.append('<tspan fill="#120018"> </tspan>')
-                continue
             lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
-            ch = chars[min(int(lum * (len(chars) - 1)), len(chars) - 1)]
+            if lum < 0.07:
+                parts.append(" ")
+                continue
+            idx = min(int(lum * (len(chars) - 1)), len(chars) - 1)
+            # White hat fur should read as a solid band, not sparse dots.
+            if r > 235 and g > 220 and b > 220:
+                idx = max(idx, len(chars) - 2)
+            ch = chars[idx]
             if ch == " ":
                 ch = "."
-            color = f"#{r:02x}{g:02x}{b:02x}"
-            parts.append(f'<tspan fill="{color}">{esc(ch)}</tspan>')
+            parts.append(f'<tspan fill="#{r:02x}{g:02x}{b:02x}">{esc(ch)}</tspan>')
         lines.append("".join(parts))
+    return lines
 
-    line_h = 11
-    text_y0 = 86
-    h = 86 + rows * line_h + 36
-    text_xml = "\n".join(
-        f'    <text x="40" y="{text_y0 + i * line_h}" xml:space="preserve" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11">{line}</text>'
-        for i, line in enumerate(lines)
-    )
+
+def gen_ascii() -> None:
+    from PIL import Image
+
+    src = _punch_backdrop(Image.open(ASSETS / "xmas-girl.gif"))
+    cols, rows = 70, 40
+    frames = [("open", _ascii_lines(src, cols, rows)), ("blink", _ascii_lines(_blink_frame(src), cols, rows))]
+    line_h = 12
+    text_y0 = 48
+    font_size = 11
+    h = text_y0 + rows * line_h + 36
+
+    def frame_xml(name: str, lines: list[str], opacity_values: str, key_times: str) -> str:
+        texts = "\n".join(
+            f'    <text x="40" y="{text_y0 + i * line_h}" xml:space="preserve" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="{font_size}">{line}</text>'
+            for i, line in enumerate(lines)
+        )
+        return f'''  <g id="ascii-{name}" opacity="{0 if name == "blink" else 1}">
+    <animate attributeName="opacity" values="{opacity_values}" keyTimes="{key_times}" dur="3.6s" repeatCount="indefinite"/>
+{texts}
+  </g>'''
+
+    # Mostly open, then a double-blink like the source GIF.
+    open_xml = frame_xml("open", frames[0][1], "1;1;0;1;1;0;1;1", "0;0.78;0.81;0.84;0.88;0.91;0.94;1")
+    blink_xml = frame_xml("blink", frames[1][1], "0;0;1;0;0;1;0;0", "0;0.78;0.81;0.84;0.88;0.91;0.94;1")
+
     body = f'''{svg_open(W, h)}
 {defs_common()}
 {card_frame(h, inner_gold=False)}
-  {section_label("ASCII PORTRAIT")}
-  <text x="28" y="58" fill="{MUTED}" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">topsy2003turvey@night-city:~$ ./render.sh --xmas-girl --charset</text>
-{text_xml}
+{open_xml}
+{blink_xml}
   <text x="{W-28}" y="{h-22}" text-anchor="end" fill="{MUTED}" font-size="10" font-family="Segoe UI, Helvetica, Arial, sans-serif" opacity="0.7">character scan complete</text>
 </svg>'''
     write_svg("ascii-portrait.svg", body)
@@ -215,7 +327,6 @@ def gen_name() -> None:
 {defs_common()}
 {card_frame(h)}
   {section_label("HOLOGRAM ID")}
-  <text x="28" y="58" fill="{MUTED}" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">topsy2003turvey@night-city:~$ ./wordart.sh --name --wave</text>
   <g filter="url(#wave)">
 {''.join(glyphs)}
   </g>
@@ -225,7 +336,7 @@ def gen_name() -> None:
 
 
 def gen_stats() -> None:
-    h = 220
+    h = 280
     stats = [
         ("0", "Stars", 0.08),
         ("44", "Contributions", 0.86),
@@ -240,11 +351,11 @@ def gen_stats() -> None:
         bw = 150
         fw = int(bw * pct)
         blocks.append(
-            f'''  <g transform="translate({x},86)">
-    <text x="0" y="0" fill="{PINK}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="36" font-weight="800" filter="url(#glow)">{val}</text>
-    <text x="0" y="28" fill="{TEXT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">{label}</text>
-    <rect x="0" y="42" width="{bw}" height="8" rx="4" fill="#2a1538"/>
-    <rect x="0" y="42" width="0" height="8" rx="4" fill="url(#barPink)">
+            f'''  <g transform="translate({x},122)">
+    <text x="0" y="38" fill="{PINK}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="36" font-weight="800" filter="url(#glow)">{val}</text>
+    <text x="0" y="76" fill="{TEXT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">{label}</text>
+    <rect x="0" y="92" width="{bw}" height="8" rx="4" fill="#2a1538"/>
+    <rect x="0" y="92" width="0" height="8" rx="4" fill="url(#barPink)">
       <animate attributeName="width" from="0" to="{fw}" dur="1.4s" begin="{0.2 + i * 0.18}s" fill="freeze"/>
     </rect>
   </g>'''
@@ -253,8 +364,8 @@ def gen_stats() -> None:
 {defs_common()}
 {card_frame(h, inner_gold=False)}
   {section_label("ANIMATED STATS")}
-  <text x="28" y="62" fill="{TEXT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="20" font-weight="700">Profile Signal</text>
-  <text x="28" y="84" fill="{MUTED}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">Live GitHub stats · Twilight / Night City</text>
+  <text x="28" y="64" fill="{TEXT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="20" font-weight="700">Profile Signal</text>
+  <text x="28" y="88" fill="{MUTED}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">Live GitHub stats · Twilight / Pretoria</text>
 {''.join(blocks)}
 </svg>'''
     write_svg("stats.svg", body)
@@ -289,7 +400,6 @@ def gen_stack() -> None:
   {section_label("ANIMATED STACK")}
   <text x="28" y="62" fill="{TEXT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="20" font-weight="700">Language Stack</text>
   <text x="28" y="84" fill="{MUTED}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">Focus-weighted technologies · Data Science Honours</text>
-  <text x="{W-28}" y="62" text-anchor="end" fill="{PURPLE}" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">&gt; stack.scan</text>
 {''.join(rows)}
 </svg>'''
     write_svg("stack.svg", body)
@@ -381,7 +491,7 @@ def gen_heatmap() -> None:
 {card_frame(h, inner_gold=False)}
   {section_label("ANIMATED HEATMAP")}
   <text x="28" y="62" fill="{TEXT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="20" font-weight="700">Contribution Activity</text>
-  <text x="28" y="82" fill="{MUTED}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12">44 contributions in the last year · arcade scan</text>
+  <text x="28" y="82" fill="{MUTED}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12">44 contributions in the last year</text>
   <text x="{W-196}" y="66" fill="{MUTED}" font-size="11" font-family="Segoe UI, Helvetica, Arial, sans-serif">Less</text>
   {''.join(legend)}
   <text x="{W-28}" y="66" text-anchor="end" fill="{MUTED}" font-size="11" font-family="Segoe UI, Helvetica, Arial, sans-serif">More</text>
@@ -400,7 +510,6 @@ def gen_heatmap() -> None:
       <animate attributeName="opacity" values="0.35;1;0.35" dur="0.18s" repeatCount="indefinite"/>
     </polygon>
   </g>
-  <text x="28" y="{h-22}" fill="{MUTED}" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">SCORE 0044  ·  SHIP ONLINE</text>
 </svg>'''
     write_svg("heatmap.svg", body)
 

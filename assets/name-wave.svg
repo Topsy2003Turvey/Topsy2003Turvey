@@ -47,7 +47,6 @@
     <animate attributeName="y" values="-16;240;-16" dur="5.5s" repeatCount="indefinite"/>
   </rect>
   <text x="28" y="38" fill="#ffe6fb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="3">HOLOGRAM ID</text>
-  <text x="28" y="58" fill="#c4a0d8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">topsy2003turvey@night-city:~$ ./wordart.sh --name --wave</text>
   <g filter="url(#wave)">
   <g transform="translate(86,130)">
     <animateTransform attributeName="transform" type="translate" values="86,118; 86,142; 86,118" dur="2.8s" begin="0.00s" repeatCount="indefinite"/>

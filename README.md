@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/banner.svg" alt="Stéfan Driaan Turvey — Night City profile card" width="850" />
+  <img src="assets/banner.svg" alt="Stéfan Driaan Turvey — Pretoria profile card" width="850" />
   <br/>
   <img src="assets/ascii-portrait.svg" alt="ASCII portrait" width="850" />
   <br/>

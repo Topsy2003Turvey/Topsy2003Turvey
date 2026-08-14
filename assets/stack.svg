@@ -49,7 +49,6 @@
   <text x="28" y="38" fill="#ffe6fb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="3">ANIMATED STACK</text>
   <text x="28" y="62" fill="#ffe6fb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="20" font-weight="700">Language Stack</text>
   <text x="28" y="84" fill="#c4a0d8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">Focus-weighted technologies · Data Science Honours</text>
-  <text x="822" y="62" text-anchor="end" fill="#bf5fff" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">&gt; stack.scan</text>
   <circle cx="40" cy="108" r="5" fill="#ff2ea6" filter="url(#glow)"/>
   <text x="56" y="112" fill="#ffe6fb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14">Python</text>
   <text x="210" y="112" fill="#c4a0d8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">42%</text>

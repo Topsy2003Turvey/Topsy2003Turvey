@@ -48,7 +48,7 @@
   </rect>
   <text x="28" y="38" fill="#ffe6fb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="3">ANIMATED HEATMAP</text>
   <text x="28" y="62" fill="#ffe6fb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="20" font-weight="700">Contribution Activity</text>
-  <text x="28" y="82" fill="#c4a0d8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12">44 contributions in the last year · arcade scan</text>
+  <text x="28" y="82" fill="#c4a0d8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12">44 contributions in the last year</text>
   <text x="654" y="66" fill="#c4a0d8" font-size="11" font-family="Segoe UI, Helvetica, Arial, sans-serif">Less</text>
   <rect x="682" y="56" width="12" height="12" rx="2" fill="#2a1538"/><rect x="698" y="56" width="12" height="12" rx="2" fill="#5c2a78"/><rect x="714" y="56" width="12" height="12" rx="2" fill="#9d4edd"/><rect x="730" y="56" width="12" height="12" rx="2" fill="#e879f9"/><rect x="746" y="56" width="12" height="12" rx="2" fill="#ffd6f5"/>
   <text x="822" y="66" text-anchor="end" fill="#c4a0d8" font-size="11" font-family="Segoe UI, Helvetica, Arial, sans-serif">More</text>
@@ -105,5 +105,4 @@
       <animate attributeName="opacity" values="0.35;1;0.35" dur="0.18s" repeatCount="indefinite"/>
     </polygon>
   </g>
-  <text x="28" y="278" fill="#c4a0d8" font-size="11" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">SCORE 0044  ·  SHIP ONLINE</text>
 </svg>
