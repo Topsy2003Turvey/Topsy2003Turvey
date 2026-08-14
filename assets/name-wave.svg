@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="850" height="240" viewBox="0 0 850 240" role="img">
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22082c"/>
+      <stop offset="45%" stop-color="#120018"/>
+      <stop offset="100%" stop-color="#1a0830"/>
+    </linearGradient>
+    <linearGradient id="neonStroke" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="50%" stop-color="#ff2ea6"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="barPink" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c026d3"/>
+      <stop offset="100%" stop-color="#ff2ea6"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="wave">
+      <feTurbulence type="fractalNoise" baseFrequency="0.015 0.04" numOctaves="2" seed="2" result="t">
+        <animate attributeName="baseFrequency" values="0.015 0.04;0.03 0.02;0.015 0.04" dur="5s" repeatCount="indefinite"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="t" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <clipPath id="cardClip">
+      <rect x="4" y="4" width="842" height="9999" rx="22"/>
+    </clipPath>
+  </defs>
+
+  <rect x="5" y="5" width="840" height="230" rx="22" fill="none" stroke="#ff2ea6" stroke-width="6" opacity="0.35" filter="url(#glow)"/>
+  <rect x="8" y="8" width="834" height="224" rx="20" fill="url(#bg)" stroke="url(#neonStroke)" stroke-width="2.5"/>
+  <rect x="12" y="12" width="826" height="216" rx="16" fill="none" stroke="#ff9f43" stroke-width="1.2" opacity="0.55"/>
+  <rect x="8" y="-16" width="834" height="10" fill="#ff2ea6" opacity="0.07" clip-path="url(#cardClip)">
+    <animate attributeName="y" values="-16;240;-16" dur="5.5s" repeatCount="indefinite"/>
+  </rect>
+  <text x="28" y="38" fill="#ffe6fb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="3">HOLOGRAM ID</text>
+  <text x="28" y="58" fill="#c4a0d8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">topsy2003turvey@night-city:~$ ./wordart.sh --name --wave</text>
+  <g filter="url(#wave)">
+  <g transform="translate(86,130)">
+    <animateTransform attributeName="transform" type="translate" values="86,118; 86,142; 86,118" dur="2.8s" begin="0.00s" repeatCount="indefinite"/>
+    <text x="4" y="4" fill="#4a0d3a" opacity="0.9" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">S</text><text x="2.5" y="2.5" fill="#9d174d" opacity="0.95" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">S</text><text x="1.2" y="1.2" fill="#ff2ea6" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">S</text><text x="0" y="0" fill="#ffe6fb" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">S</text>
+  </g>  <g transform="translate(138,130)">
+    <animateTransform attributeName="transform" type="translate" values="138,118; 138,142; 138,118" dur="2.8s" begin="0.09s" repeatCount="indefinite"/>
+    <text x="4" y="4" fill="#4a0d3a" opacity="0.9" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">T</text><text x="2.5" y="2.5" fill="#9d174d" opacity="0.95" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">T</text><text x="1.2" y="1.2" fill="#ff2ea6" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">T</text><text x="0" y="0" fill="#ffe6fb" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">T</text>
+  </g>  <g transform="translate(190,130)">
+    <animateTransform attributeName="transform" type="translate" values="190,118; 190,142; 190,118" dur="2.8s" begin="0.18s" repeatCount="indefinite"/>
+    <text x="4" y="4" fill="#4a0d3a" opacity="0.9" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">E</text><text x="2.5" y="2.5" fill="#9d174d" opacity="0.95" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">E</text><text x="1.2" y="1.2" fill="#ff2ea6" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">E</text><text x="0" y="0" fill="#ffe6fb" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">E</text>
+  </g>  <g transform="translate(242,130)">
+    <animateTransform attributeName="transform" type="translate" values="242,118; 242,142; 242,118" dur="2.8s" begin="0.27s" repeatCount="indefinite"/>
+    <text x="4" y="4" fill="#4a0d3a" opacity="0.9" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">F</text><text x="2.5" y="2.5" fill="#9d174d" opacity="0.95" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">F</text><text x="1.2" y="1.2" fill="#ff2ea6" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">F</text><text x="0" y="0" fill="#ffe6fb" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">F</text>
+  </g>  <g transform="translate(294,130)">
+    <animateTransform attributeName="transform" type="translate" values="294,118; 294,142; 294,118" dur="2.8s" begin="0.36s" repeatCount="indefinite"/>
+    <text x="4" y="4" fill="#4a0d3a" opacity="0.9" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">A</text><text x="2.5" y="2.5" fill="#9d174d" opacity="0.95" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">A</text><text x="1.2" y="1.2" fill="#ff2ea6" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">A</text><text x="0" y="0" fill="#ffe6fb" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">A</text>
+  </g>  <g transform="translate(346,130)">
+    <animateTransform attributeName="transform" type="translate" values="346,118; 346,142; 346,118" dur="2.8s" begin="0.45s" repeatCount="indefinite"/>
+    <text x="4" y="4" fill="#4a0d3a" opacity="0.9" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">N</text><text x="2.5" y="2.5" fill="#9d174d" opacity="0.95" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">N</text><text x="1.2" y="1.2" fill="#ff2ea6" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">N</text><text x="0" y="0" fill="#ffe6fb" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">N</text>
+  </g>  <g transform="translate(450,130)">
+    <animateTransform attributeName="transform" type="translate" values="450,118; 450,142; 450,118" dur="2.8s" begin="0.63s" repeatCount="indefinite"/>
+    <text x="4" y="4" fill="#4a0d3a" opacity="0.9" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">T</text><text x="2.5" y="2.5" fill="#9d174d" opacity="0.95" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">T</text><text x="1.2" y="1.2" fill="#ff2ea6" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">T</text><text x="0" y="0" fill="#ffe6fb" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">T</text>
+  </g>  <g transform="translate(502,130)">
+    <animateTransform attributeName="transform" type="translate" values="502,118; 502,142; 502,118" dur="2.8s" begin="0.72s" repeatCount="indefinite"/>
+    <text x="4" y="4" fill="#4a0d3a" opacity="0.9" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">U</text><text x="2.5" y="2.5" fill="#9d174d" opacity="0.95" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">U</text><text x="1.2" y="1.2" fill="#ff2ea6" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">U</text><text x="0" y="0" fill="#ffe6fb" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">U</text>
+  </g>  <g transform="translate(554,130)">
+    <animateTransform attributeName="transform" type="translate" values="554,118; 554,142; 554,118" dur="2.8s" begin="0.81s" repeatCount="indefinite"/>
+    <text x="4" y="4" fill="#4a0d3a" opacity="0.9" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">R</text><text x="2.5" y="2.5" fill="#9d174d" opacity="0.95" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">R</text><text x="1.2" y="1.2" fill="#ff2ea6" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">R</text><text x="0" y="0" fill="#ffe6fb" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">R</text>
+  </g>  <g transform="translate(606,130)">
+    <animateTransform attributeName="transform" type="translate" values="606,118; 606,142; 606,118" dur="2.8s" begin="0.90s" repeatCount="indefinite"/>
+    <text x="4" y="4" fill="#4a0d3a" opacity="0.9" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">V</text><text x="2.5" y="2.5" fill="#9d174d" opacity="0.95" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">V</text><text x="1.2" y="1.2" fill="#ff2ea6" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">V</text><text x="0" y="0" fill="#ffe6fb" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">V</text>
+  </g>  <g transform="translate(658,130)">
+    <animateTransform attributeName="transform" type="translate" values="658,118; 658,142; 658,118" dur="2.8s" begin="0.99s" repeatCount="indefinite"/>
+    <text x="4" y="4" fill="#4a0d3a" opacity="0.9" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">E</text><text x="2.5" y="2.5" fill="#9d174d" opacity="0.95" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">E</text><text x="1.2" y="1.2" fill="#ff2ea6" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">E</text><text x="0" y="0" fill="#ffe6fb" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">E</text>
+  </g>  <g transform="translate(710,130)">
+    <animateTransform attributeName="transform" type="translate" values="710,118; 710,142; 710,118" dur="2.8s" begin="1.08s" repeatCount="indefinite"/>
+    <text x="4" y="4" fill="#4a0d3a" opacity="0.9" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">Y</text><text x="2.5" y="2.5" fill="#9d174d" opacity="0.95" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">Y</text><text x="1.2" y="1.2" fill="#ff2ea6" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">Y</text><text x="0" y="0" fill="#ffe6fb" opacity="1.0" font-family="Arial Black, Impact, Segoe UI, sans-serif" font-size="54" font-weight="900">Y</text>
+  </g>
+  </g>
+  <text x="425" y="208" text-anchor="middle" fill="#ffb3ec" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" letter-spacing="6">STEFAN TURVEY</text>
+</svg>
