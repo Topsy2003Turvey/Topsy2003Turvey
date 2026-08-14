@@ -5,13 +5,27 @@ from __future__ import annotations
 
 import base64
 import json
+import os
+import re
+import urllib.error
+import urllib.request
 from collections import deque
+from datetime import date, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 ASSETS = ROOT / "assets"
+STATS_CACHE = ASSETS / "github-stats.json"
+GITHUB_USER = os.environ.get("GITHUB_USER", "Topsy2003Turvey")
 
 W = 850
+LEVEL_MAP = {
+    "NONE": 0,
+    "FIRST_QUARTILE": 1,
+    "SECOND_QUARTILE": 2,
+    "THIRD_QUARTILE": 3,
+    "FOURTH_QUARTILE": 4,
+}
 
 # Cyberpunk 2077 × Twilight × VS Code
 PINK = "#ff2ea6"
@@ -129,9 +143,181 @@ def load_b64(path: Path) -> str:
     return f"data:{mime};base64,{b64}"
 
 
+def _http_json(url: str, payload: dict | None = None) -> dict:
+    headers = {
+        "User-Agent": "Topsy2003Turvey-profile",
+        "Accept": "application/vnd.github+json",
+    }
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    data = None
+    if payload is not None:
+        headers["Content-Type"] = "application/json"
+        data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers=headers)
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
+
+def _http_text(url: str) -> str:
+    req = urllib.request.Request(
+        url,
+        headers={"User-Agent": "Mozilla/5.0 Topsy2003Turvey-profile"},
+    )
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        return resp.read().decode("utf-8", "replace")
+
+
+def _bar(value: int, cap: int) -> float:
+    if value <= 0:
+        return 0.08
+    return max(0.12, min(1.0, value / cap))
+
+
+def _fmt_num(n: int) -> str:
+    if n >= 1_000_000:
+        text = f"{n / 1_000_000:.1f}M"
+        return text.replace(".0M", "M")
+    if n >= 10_000:
+        text = f"{n / 1000:.1f}k"
+        return text.replace(".0k", "k")
+    return str(n)
+
+
+def _empty_stats() -> dict:
+    return {
+        "followers": 0,
+        "repos": 0,
+        "stars": 0,
+        "contributions": 0,
+        "calendar": [],
+    }
+
+
+def _fetch_via_graphql(login: str) -> dict:
+    query = """
+    query($login: String!) {
+      user(login: $login) {
+        followers { totalCount }
+        repositories(first: 100, ownerAffiliations: OWNER, privacy: PUBLIC) {
+          totalCount
+          nodes { stargazerCount isFork }
+        }
+        contributionsCollection {
+          contributionCalendar {
+            totalContributions
+            weeks {
+              contributionDays { date contributionLevel }
+            }
+          }
+        }
+      }
+    }
+    """
+    data = _http_json(
+        "https://api.github.com/graphql",
+        {"query": query, "variables": {"login": login}},
+    )
+    if data.get("errors") or not data.get("data", {}).get("user"):
+        raise RuntimeError(data.get("errors") or "GraphQL user missing")
+    user = data["data"]["user"]
+    cal = user["contributionsCollection"]["contributionCalendar"]
+    calendar = []
+    for week in cal["weeks"]:
+        for day in week["contributionDays"]:
+            calendar.append(
+                [day["date"], LEVEL_MAP.get(day["contributionLevel"], 0)]
+            )
+    stars = sum(
+        node["stargazerCount"]
+        for node in user["repositories"]["nodes"]
+        if not node["isFork"]
+    )
+    return {
+        "followers": user["followers"]["totalCount"],
+        "repos": user["repositories"]["totalCount"],
+        "stars": stars,
+        "contributions": cal["totalContributions"],
+        "calendar": calendar,
+    }
+
+
+def _fetch_calendar_html(login: str) -> tuple[int, list[list]]:
+    html = _http_text(f"https://github.com/users/{login}/contributions")
+    days: dict[str, int] = {}
+    for m in re.finditer(r"<td\b[^>]*\bContributionCalendar-day\b[^>]*>", html, re.I):
+        tag = m.group(0)
+        date_m = re.search(r'data-date="(\d{4}-\d{2}-\d{2})"', tag)
+        level_m = re.search(r'data-level="(\d+)"', tag)
+        if date_m and level_m:
+            days[date_m.group(1)] = int(level_m.group(1))
+    calendar = [[d, days[d]] for d in sorted(days)]
+    total_m = re.search(
+        r"([\d,]+)\s+contributions\s+in\s+the\s+last\s+year", html, re.I
+    )
+    total = int(total_m.group(1).replace(",", "")) if total_m else sum(
+        1 for _, level in calendar if level
+    )
+    return total, calendar
+
+
+def _fetch_via_rest(login: str) -> dict:
+    user = _http_json(f"https://api.github.com/users/{login}")
+    repos = _http_json(
+        f"https://api.github.com/users/{login}/repos?per_page=100&type=owner"
+    )
+    stars = sum(repo.get("stargazers_count", 0) for repo in repos if not repo.get("fork"))
+    total, calendar = _fetch_calendar_html(login)
+    return {
+        "followers": int(user.get("followers") or 0),
+        "repos": int(user.get("public_repos") or 0),
+        "stars": stars,
+        "contributions": total,
+        "calendar": calendar,
+    }
+
+
+def fetch_github_stats() -> dict:
+    stats = _empty_stats()
+    try:
+        token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+        if token:
+            stats = _fetch_via_graphql(GITHUB_USER)
+        else:
+            stats = _fetch_via_rest(GITHUB_USER)
+    except (urllib.error.URLError, TimeoutError, RuntimeError, json.JSONDecodeError, OSError) as exc:
+        print(f"live GitHub fetch failed ({exc}); trying fallback")
+        try:
+            stats = _fetch_via_rest(GITHUB_USER)
+        except (urllib.error.URLError, TimeoutError, RuntimeError, json.JSONDecodeError, OSError, ValueError) as exc2:
+            print(f"REST fallback failed ({exc2}); using cached stats")
+            if STATS_CACHE.exists():
+                stats = json.loads(STATS_CACHE.read_text(encoding="utf-8"))
+    STATS_CACHE.write_text(json.dumps(stats, separators=(",", ":")), encoding="utf-8")
+    print(
+        f"live stats @{GITHUB_USER}: stars={stats['stars']} "
+        f"contrib={stats['contributions']} repos={stats['repos']} "
+        f"followers={stats['followers']} days={len(stats['calendar'])}"
+    )
+    return stats
+
+
+_STATS: dict | None = None
+
+
+def get_stats() -> dict:
+    global _STATS
+    if _STATS is None:
+        _STATS = fetch_github_stats()
+    return _STATS
+
+
 def gen_banner() -> None:
+    stats = get_stats()
     avatar = load_b64(ASSETS / "avatar.png")
     h = 230
+    contrib = _fmt_num(int(stats["contributions"]))
     body = f'''{svg_open(W, h)}
 {defs_common()}
   <clipPath id="ava">
@@ -154,7 +340,7 @@ def gen_banner() -> None:
     <rect x="354" y="172" width="64" height="26" rx="13" fill="#14081c" stroke="{GOLD}" stroke-width="1.2"/>
     <text x="386" y="190" text-anchor="middle">Java</text>
   </g>
-  <text x="792" y="118" text-anchor="end" fill="{PINK}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="52" font-weight="800" filter="url(#softGlow)">44</text>
+  <text x="792" y="118" text-anchor="end" fill="{PINK}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="52" font-weight="800" filter="url(#softGlow)">{contrib}</text>
   <text x="792" y="146" text-anchor="end" fill="{TEXT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="2.4">CONTRIBUTIONS</text>
 </svg>'''
     write_svg("banner.svg", body)
@@ -337,11 +523,12 @@ def gen_name() -> None:
 
 def gen_stats() -> None:
     h = 280
+    live = get_stats()
     stats = [
-        ("0", "Stars", 0.08),
-        ("44", "Contributions", 0.86),
-        ("1", "Repos", 0.18),
-        ("7", "Followers", 0.42),
+        (_fmt_num(int(live["stars"])), "Stars", _bar(int(live["stars"]), 25)),
+        (_fmt_num(int(live["contributions"])), "Contributions", _bar(int(live["contributions"]), 100)),
+        (_fmt_num(int(live["repos"])), "Repos", _bar(int(live["repos"]), 8)),
+        (_fmt_num(int(live["followers"])), "Followers", _bar(int(live["followers"]), 25)),
     ]
     col_w = 190
     x0 = 42
@@ -406,18 +593,30 @@ def gen_stack() -> None:
 
 
 def gen_heatmap() -> None:
-    data = json.loads((ASSETS / "contributions.json").read_text())
+    live = get_stats()
+    raw_days = live.get("calendar") or []
+    by_date = {str(day): int(level) for day, level in raw_days}
     weeks: list[list[int | None]] = []
-    week: list[int | None] = []
-    for _date, level in data:
-        week.append(int(level))
-        if len(week) == 7:
+    week_starts: list[date] = []
+    if by_date:
+        first = date.fromisoformat(min(by_date))
+        last = date.fromisoformat(max(by_date))
+        start = first - timedelta(days=(first.weekday() + 1) % 7)
+        week: list[int | None] = []
+        cursor = start
+        while cursor <= last:
+            if len(week) == 0:
+                week_starts.append(cursor)
+            key = cursor.isoformat()
+            week.append(by_date.get(key, None) if key >= first.isoformat() else None)
+            if len(week) == 7:
+                weeks.append(week)
+                week = []
+            cursor += timedelta(days=1)
+        if week:
+            while len(week) < 7:
+                week.append(None)
             weeks.append(week)
-            week = []
-    if week:
-        while len(week) < 7:
-            week.append(None)
-        weeks.append(week)
 
     cell, gap = 11, 3
     step = cell + gap
@@ -435,7 +634,7 @@ def gen_heatmap() -> None:
             if level is None:
                 continue
             y = gy + di * step
-            fill = HEAT[level]
+            fill = HEAT[min(max(int(level), 0), len(HEAT) - 1)]
             if level:
                 cells.append(
                     f'''  <rect x="{x}" y="{y}" width="{cell}" height="{cell}" rx="2" fill="{fill}">
@@ -447,27 +646,14 @@ def gen_heatmap() -> None:
                     f'  <rect x="{x}" y="{y}" width="{cell}" height="{cell}" rx="2" fill="{fill}"/>'
                 )
 
-    months = [
-        ("Aug", 0),
-        ("Sep", 4),
-        ("Oct", 8),
-        ("Nov", 12),
-        ("Dec", 17),
-        ("Jan", 21),
-        ("Feb", 25),
-        ("Mar", 29),
-        ("Apr", 34),
-        ("May", 38),
-        ("Jun", 43),
-        ("Jul", 47),
-        ("Aug", 51),
-    ]
     month_xml = []
-    for label, col in months:
-        if col < len(weeks):
+    prev_month = None
+    for col, start_day in enumerate(week_starts):
+        if start_day.month != prev_month:
             month_xml.append(
-                f'<text x="{gx + col * step}" y="{gy - 10}" fill="{MUTED}" font-size="10" font-family="Segoe UI, Helvetica, Arial, sans-serif">{label}</text>'
+                f'<text x="{gx + col * step}" y="{gy - 10}" fill="{MUTED}" font-size="10" font-family="Segoe UI, Helvetica, Arial, sans-serif">{start_day.strftime("%b")}</text>'
             )
+            prev_month = start_day.month
 
     legend = []
     for i, c in enumerate(HEAT):
@@ -491,7 +677,7 @@ def gen_heatmap() -> None:
 {card_frame(h, inner_gold=False)}
   {section_label("ANIMATED HEATMAP")}
   <text x="28" y="62" fill="{TEXT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="20" font-weight="700">Contribution Activity</text>
-  <text x="28" y="82" fill="{MUTED}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12">44 contributions in the last year</text>
+  <text x="28" y="82" fill="{MUTED}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12">{_fmt_num(int(live["contributions"]))} contributions in the last year</text>
   <text x="{W-196}" y="66" fill="{MUTED}" font-size="11" font-family="Segoe UI, Helvetica, Arial, sans-serif">Less</text>
   {''.join(legend)}
   <text x="{W-28}" y="66" text-anchor="end" fill="{MUTED}" font-size="11" font-family="Segoe UI, Helvetica, Arial, sans-serif">More</text>
@@ -520,10 +706,9 @@ def gen_whoami() -> None:
 {defs_common()}
 {card_frame(h, inner_gold=False)}
   {section_label("WHOAMI")}
-  <text x="28" y="64" fill="{CYAN}" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">topsy2003turvey@night-city:~$ whoami</text>
-  <text x="28" y="92" fill="{TEXT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16">Studying for a Bachelor of Science Honours in IT Specializing in Data Science</text>
-  <text x="28" y="118" fill="{PINK_SOFT}" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">location: South Africa  ·  timezone: UTC+02  ·  status: Focusing</text>
-  <text x="28" y="142" fill="{MUTED}" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">Butler: Goeiedag, Meneer! Mag u 'n produktiewe sessie hê.</text>
+  <text x="28" y="78" fill="{TEXT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16">Studying for a Bachelor of Science Honours in IT Specializing in Data Science</text>
+  <text x="28" y="108" fill="{PINK_SOFT}" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">location: South Africa  ·  timezone: UTC+02  ·  status: Focusing</text>
+  <text x="28" y="140" fill="{MUTED}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">“Only failure makes us experts.” — Theo de Raadt</text>
 </svg>'''
     write_svg("whoami.svg", body)
 
@@ -547,6 +732,7 @@ def gen_link_button(filename: str, label: str, sub: str) -> None:
 
 def main() -> None:
     ASSETS.mkdir(exist_ok=True)
+    get_stats()
     gen_banner()
     gen_ascii()
     gen_name()

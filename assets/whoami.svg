@@ -47,8 +47,7 @@
     <animate attributeName="y" values="-16;168;-16" dur="5.5s" repeatCount="indefinite"/>
   </rect>
   <text x="28" y="38" fill="#ffe6fb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="3">WHOAMI</text>
-  <text x="28" y="64" fill="#67e8f9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">topsy2003turvey@night-city:~$ whoami</text>
-  <text x="28" y="92" fill="#ffe6fb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16">Studying for a Bachelor of Science Honours in IT Specializing in Data Science</text>
-  <text x="28" y="118" fill="#ffb3ec" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">location: South Africa  ·  timezone: UTC+02  ·  status: Focusing</text>
-  <text x="28" y="142" fill="#c4a0d8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">Butler: Goeiedag, Meneer! Mag u 'n produktiewe sessie hê.</text>
+  <text x="28" y="78" fill="#ffe6fb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16">Studying for a Bachelor of Science Honours in IT Specializing in Data Science</text>
+  <text x="28" y="108" fill="#ffb3ec" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">location: South Africa  ·  timezone: UTC+02  ·  status: Focusing</text>
+  <text x="28" y="140" fill="#c4a0d8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">“Only failure makes us experts.” — Theo de Raadt</text>
 </svg>

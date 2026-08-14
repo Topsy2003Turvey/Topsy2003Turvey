@@ -1,0 +1,47 @@
+name: Refresh live stats
+
+on:
+  schedule:
+    - cron: "17 3,9,15,21 * * *"
+  workflow_dispatch:
+  push:
+    branches: [master, main]
+    paths-ignore:
+      - "assets/**"
+      - "README.md"
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch live GitHub stats and rebuild SVGs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_USER: Topsy2003Turvey
+        run: python generate.py
+
+      - name: Commit updated cards
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/*.svg assets/github-stats.json
+          if git diff --staged --quiet; then
+            echo "No live-stat changes"
+            exit 0
+          fi
+          git commit -m "chore: refresh live GitHub stats [skip ci]"
+          git push
