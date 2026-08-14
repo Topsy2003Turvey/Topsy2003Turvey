@@ -57,11 +57,11 @@
       <animate attributeName="width" from="0" to="12" dur="1.4s" begin="0.2s" fill="freeze"/>
     </rect>
   </g>  <g transform="translate(232,122)">
-    <text x="0" y="38" fill="#ff2ea6" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="36" font-weight="800" filter="url(#glow)">47</text>
+    <text x="0" y="38" fill="#ff2ea6" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="36" font-weight="800" filter="url(#glow)">50</text>
     <text x="0" y="76" fill="#ffe6fb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">Contributions</text>
     <rect x="0" y="92" width="150" height="8" rx="4" fill="#2a1538"/>
     <rect x="0" y="92" width="0" height="8" rx="4" fill="url(#barPink)">
-      <animate attributeName="width" from="0" to="70" dur="1.4s" begin="0.38s" fill="freeze"/>
+      <animate attributeName="width" from="0" to="75" dur="1.4s" begin="0.38s" fill="freeze"/>
     </rect>
   </g>  <g transform="translate(422,122)">
     <text x="0" y="38" fill="#ff2ea6" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="36" font-weight="800" filter="url(#glow)">2</text>
@@ -71,11 +71,11 @@
       <animate attributeName="width" from="0" to="37" dur="1.4s" begin="0.56s" fill="freeze"/>
     </rect>
   </g>  <g transform="translate(612,122)">
-    <text x="0" y="38" fill="#ff2ea6" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="36" font-weight="800" filter="url(#glow)">7</text>
+    <text x="0" y="38" fill="#ff2ea6" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="36" font-weight="800" filter="url(#glow)">8</text>
     <text x="0" y="76" fill="#ffe6fb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">Followers</text>
     <rect x="0" y="92" width="150" height="8" rx="4" fill="#2a1538"/>
     <rect x="0" y="92" width="0" height="8" rx="4" fill="url(#barPink)">
-      <animate attributeName="width" from="0" to="42" dur="1.4s" begin="0.74s" fill="freeze"/>
+      <animate attributeName="width" from="0" to="48" dur="1.4s" begin="0.74s" fill="freeze"/>
     </rect>
   </g>
 </svg>
