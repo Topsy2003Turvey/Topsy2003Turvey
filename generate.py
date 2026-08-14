@@ -339,6 +339,8 @@ def gen_banner() -> None:
     <text x="290" y="190" text-anchor="middle">Data Science</text>
     <rect x="354" y="172" width="64" height="26" rx="13" fill="#14081c" stroke="{GOLD}" stroke-width="1.2"/>
     <text x="386" y="190" text-anchor="middle">Java</text>
+    <rect x="428" y="172" width="98" height="26" rx="13" fill="#14081c" stroke="{GOLD}" stroke-width="1.2"/>
+    <text x="477" y="190" text-anchor="middle">TypeScript</text>
   </g>
   <text x="792" y="118" text-anchor="end" fill="{PINK}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="52" font-weight="800" filter="url(#softGlow)">{contrib}</text>
   <text x="792" y="146" text-anchor="end" fill="{TEXT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="2.4">CONTRIBUTIONS</text>
@@ -559,12 +561,13 @@ def gen_stats() -> None:
 
 
 def gen_stack() -> None:
-    h = 268
+    h = 296
     langs = [
-        ("Python", "42%", 0.42, PINK),
-        ("Java", "24%", 0.24, PURPLE),
-        ("Terraform", "18%", 0.18, GOLD),
-        ("Azure", "12%", 0.12, CYAN),
+        ("Python", "36%", 0.36, PINK),
+        ("Java", "20%", 0.20, PURPLE),
+        ("TypeScript", "18%", 0.18, CYAN),
+        ("Terraform", "14%", 0.14, GOLD),
+        ("Azure", "8%", 0.08, PINK_HOT),
         ("SQL", "4%", 0.04, PINK_SOFT),
     ]
     rows = []
