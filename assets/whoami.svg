@@ -48,6 +48,6 @@
   </rect>
   <text x="28" y="38" fill="#ffe6fb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="3">WHOAMI</text>
   <text x="28" y="78" fill="#ffe6fb" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16">Studying for a Bachelor of Science Honours in IT Specializing in Data Science</text>
-  <text x="28" y="108" fill="#ffb3ec" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">location: South Africa  ·  timezone: UTC+02  ·  status: Focusing</text>
+  <text x="28" y="108" fill="#ffb3ec" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">location: South Africa  ·  timezone: UTC+02  ·  site: stefanturvey.tech</text>
   <text x="28" y="140" fill="#c4a0d8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">“Only failure makes us experts.” — Theo de Raadt</text>
 </svg>

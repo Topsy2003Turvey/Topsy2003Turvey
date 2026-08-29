@@ -710,7 +710,7 @@ def gen_whoami() -> None:
 {card_frame(h, inner_gold=False)}
   {section_label("WHOAMI")}
   <text x="28" y="78" fill="{TEXT}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16">Studying for a Bachelor of Science Honours in IT Specializing in Data Science</text>
-  <text x="28" y="108" fill="{PINK_SOFT}" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">location: South Africa  ·  timezone: UTC+02  ·  status: Focusing</text>
+  <text x="28" y="108" fill="{PINK_SOFT}" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">location: South Africa  ·  timezone: UTC+02  ·  site: stefanturvey.tech</text>
   <text x="28" y="140" fill="{MUTED}" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">“Only failure makes us experts.” — Theo de Raadt</text>
 </svg>'''
     write_svg("whoami.svg", body)
@@ -762,6 +762,7 @@ def main() -> None:
     gen_stack()
     gen_heatmap()
     gen_whoami()
+    gen_link_button("link-website.svg", "Website", "stefanturvey.tech")
     gen_link_button("link-github.svg", "GitHub", "@Topsy2003Turvey")
     gen_link_button("link-linkedin.svg", "LinkedIn", "stéfan-turvey")
     gen_link_button("link-stackoverflow.svg", "Stack Overflow", "71 reputation")
