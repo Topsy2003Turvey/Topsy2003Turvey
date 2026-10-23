@@ -1,15 +1,15 @@
 <div align="center">
-  <img src="assets/banner.svg?v=82-7-5-0" alt="Stéfan Driaan Turvey — Pretoria profile card" width="850" />
+  <img src="assets/banner.svg?v=84-7-6-0" alt="Stéfan Driaan Turvey — Pretoria profile card" width="850" />
   <br/>
   <img src="assets/ascii-portrait.svg" alt="ASCII portrait" width="850" />
   <br/>
   <img src="assets/name-wave.svg" alt="Stefan Turvey hologram name" width="850" />
   <br/>
-  <img src="assets/stats.svg?v=82-7-5-0" alt="Animated GitHub stats" width="850" />
+  <img src="assets/stats.svg?v=84-7-6-0" alt="Animated GitHub stats" width="850" />
   <br/>
   <img src="assets/stack.svg" alt="Animated language stack" width="850" />
   <br/>
-  <img src="assets/heatmap.svg?v=82-7-5-0" alt="Arcade contribution heatmap" width="850" />
+  <img src="assets/heatmap.svg?v=84-7-6-0" alt="Arcade contribution heatmap" width="850" />
   <br/>
   <img src="assets/whoami.svg" alt="whoami" width="850" />
   <br/><br/>
